@@ -47,13 +47,12 @@ public class ChooseLanguageUseCase {
             default -> "txt";
         };
         Path fileLocation = Path.of(System.getProperty("user.dir"), "language_folder", randomClassName + "." + fileExtension);
-        executeProgram(fileExtension);
         try {
             Files.createDirectories(fileLocation.getParent());
             try (FileWriter fileWriter = new FileWriter(fileLocation.toFile())) {
                 fileWriter.write(logic);
             }
-            return "";
+            return executeProgram(fileLocation, selectedLanguage);
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
             return "";
@@ -61,24 +60,39 @@ public class ChooseLanguageUseCase {
     }
 
 
-    public String executeProgram(String fileExt) {
+    public String executeProgram(Path filePath, String language) {
         try {
-            Process process = new ProcessBuilder("python", "--version").start();
-
-            // Read the output of the command
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            System.out.println(reader.readLine());
-            StringBuilder output = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+            ProcessBuilder processBuilder;
+            switch (language.toLowerCase()) {
+                case "python" -> processBuilder = new ProcessBuilder("python", filePath.toString());
+                case "javascript", "js" -> processBuilder = new ProcessBuilder("node", filePath.toString());
+                case "php" -> processBuilder = new ProcessBuilder("php", filePath.toString());
+                case "java" -> {
+                    String className = filePath.getFileName().toString().replace(".java", "");
+                    ProcessBuilder compileBuilder = new ProcessBuilder("javac", filePath.toString());
+                    compileBuilder.directory(filePath.getParent().toFile());
+                    compileBuilder.start().waitFor(); // Compile Java file
+                    processBuilder = new ProcessBuilder("java", className);
+                    processBuilder.directory(filePath.getParent().toFile());
+                }
+                default -> throw new UnsupportedOperationException("Execution for language " + language + " is not supported.");
             }
-            LOG.info("->>>>>>>>>>>>>>>>>>{}", output);
-            return output.toString();
-        } catch (IOException e) {
-            LOG.error("IOException occurred while executing the program", e);
-            throw new RuntimeException("Error executing program", e);
+
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            // Read the process output
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                StringBuilder output = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+                return output.toString();
+            }
+        } catch (Exception e) {
+            LOG.error("Error while executing program for language {}: {}", language, e.getMessage());
+            return "Error executing program.";
         }
     }
 }
