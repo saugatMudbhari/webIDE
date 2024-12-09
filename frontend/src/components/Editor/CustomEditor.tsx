@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import MonacoEditor from 'react-monaco-editor';
 
-const CustomEditor: React.FC = () => {
-    const [code, setCode] = useState<string>("var message = 'Monaco Editor!' \nconsole.log(message);");
 
+interface CustomEditorProps {
+    language: string;
+    code: string;
+    onChange: (newCode: string) => void;
+}
+
+const CustomEditor: React.FC<CustomEditorProps> = ({language, code, onChange}) => {
     const handleEditorChange = (newValue: string) => {
-        setCode(newValue);
+        onChange(newValue);
     };
-
     return (
         <MonacoEditor
-            height="400px"
-            language="javascript"
+            height="95vh"
+            width="75%"
+            language={language}
             theme="vs-dark"
             value={code}
             onChange={handleEditorChange}
@@ -19,7 +24,7 @@ const CustomEditor: React.FC = () => {
                 fontSize: 16,
                 formatOnType: true,
                 autoClosingBrackets: true,
-                minimap: { enabled: true, scale: 1 },
+                minimap: {enabled: true, scale: 1},
                 inlineSuggest: true,
             }}
         />
