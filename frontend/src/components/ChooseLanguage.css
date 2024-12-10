@@ -48,3 +48,7 @@
 .language-dropdown option:disabled {
     color: #aaa;
 }
+
+.code-editor-layout{
+    display: flex;
+}

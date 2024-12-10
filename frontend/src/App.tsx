@@ -4,7 +4,7 @@ import {useState} from "react";
 import languageSnippets from "./components/Editor/DefaultLanguageSnippet.ts";
 
 function App() {
-    const languages:string[] = ["javascript","c","c++","java","python", "php"]
+    const languages: string[] = ["javascript", "c", "c++", "java", "python", "php"]
     const [selectedLanguage, setSelectedLanguage] = useState<string>(languages[0]);
     const [code, setCode] = useState<string>(languageSnippets[languages[0]]);
 
@@ -22,8 +22,9 @@ function App() {
     return (
         <>
             <>
-                <ChooseLanguage languages={languages} onSelectLanguage={handleLanguageSelect} defaultLanguage={selectedLanguage} />
-                <CustomEditor language={selectedLanguage} code={code} onChange={handleEditorChange} />
+                <ChooseLanguage languages={languages} onSelectLanguage={handleLanguageSelect}
+                                defaultLanguage={selectedLanguage}/>
+                <CustomEditor language={selectedLanguage} code={code} onChange={handleEditorChange}/>
             </>
         </>
     )
