@@ -6,12 +6,17 @@ interface TerminalLayoutProps {
     parameters: string[];
 }
 
-const TerminalLayout: React.FC<TerminalLayoutProps> = ({ language, code, parameters }) => {
+const TerminalLayout: React.FC<TerminalLayoutProps> = ({language, code, parameters}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    console.log("-->>>>>", language, code, parameters);
     const executeCode = async () => {
+        if (!language || language.trim() === '') {
+            setError('Please select a language.');
+            return;
+        }
         setIsLoading(true);
         setError(null);
         setResult(null);
@@ -20,13 +25,14 @@ const TerminalLayout: React.FC<TerminalLayoutProps> = ({ language, code, paramet
             const response = await fetch('http://localhost:8080/execute-language', {
                 method: 'POST',
                 body: JSON.stringify({
-                    language: language,
+                    writeLanguage: language,
                     code: code,
-                    parameters: parameters,
+                    Parameters: parameters,
                 }),
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                // credentials: 'include'
             });
 
             if (!response.ok) {
@@ -47,7 +53,7 @@ const TerminalLayout: React.FC<TerminalLayoutProps> = ({ language, code, paramet
             <button onClick={executeCode} disabled={isLoading}>
                 {isLoading ? 'Executing...' : 'Execute Code'}
             </button>
-            {error && <div style={{ color: 'red' }}>{error}</div>}
+            {error && <div style={{color: 'red'}}>{error}</div>}
             {result && <div>Result: {result}</div>}
         </div>
     );

@@ -51,6 +51,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ({ language, code, onChange })
                     inlineSuggest: true,
                 }}
             />
+
             <TerminalLayout code={code} language={language} parameters={paramValue} />
             <div
                 style={{

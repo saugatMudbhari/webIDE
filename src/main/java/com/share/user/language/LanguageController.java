@@ -3,8 +3,7 @@ package com.share.user.language;
 import com.share.user.language.dto.UserWriteLanguage;
 import com.share.user.language.usecase.ChooseLanguageUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -18,8 +17,14 @@ public class LanguageController {
 
 
     @PostMapping("/execute-language")
-    public String selectLanguage(UserWriteLanguage language){
+    @CrossOrigin(origins = "*")
+    public String selectLanguage(@RequestBody UserWriteLanguage language) {
         return chooseLanguageUseCase.selectLanguage(language);
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
     }
 
 }
